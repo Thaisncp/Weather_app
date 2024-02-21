@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class WeatherData {
   final String msg;
   final int totalCount;
@@ -21,44 +23,39 @@ class WeatherData {
 }
 
 class WeatherEntry {
-  final String dateTime;
-  final int windSpeed;
-  final double temperature;
-  final int humidity;
-  final double barometricPressure;
-  final DateTime? deletedAt;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final String state;
-  final String id;
+  DateTime? dateTime;
+  double windSpeed;
+  double temperature;
+  int humidity;
+  double barometricPressure;
+  String state;
+  DateTime? deletedAt;
+  DateTime? createdAt;
+  String id;
 
   WeatherEntry({
-    required this.dateTime,
+    this.dateTime,
     required this.windSpeed,
     required this.temperature,
     required this.humidity,
     required this.barometricPressure,
-    required this.deletedAt,
-    required this.createdAt,
-    required this.updatedAt,
     required this.state,
+    this.deletedAt,
+    this.createdAt,
     required this.id,
   });
 
   factory WeatherEntry.fromJson(Map<String, dynamic> json) {
     return WeatherEntry(
-      dateTime: json['dateTime'],
-      windSpeed: json['windSpeed'],
-      temperature: json['temperature'],
-      humidity: json['humidity'],
-      barometricPressure: json['barometricPressure'],
-      deletedAt: json['deletedAt'] != null
-          ? DateTime.parse(json['deletedAt'])
-          : null,
-      createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
-      state: json['state'],
-      id: json['id'],
+      dateTime: json['dateTime'] != null ? DateTime.parse(json['dateTime']) : null,
+      windSpeed: json['windSpeed']?.toDouble() ?? 0.0,
+      temperature: json['temperature']?.toDouble() ?? 0.0,
+      humidity: json['humidity'] ?? 0,
+      barometricPressure: json['barometricPressure']?.toDouble() ?? 0.0,
+      state: json['state'] ?? "",
+      deletedAt: json['deletedAt'] != null ? DateTime.parse(json['deletedAt']) : null,
+      createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
+      id: json['id'] ?? "",
     );
   }
 }

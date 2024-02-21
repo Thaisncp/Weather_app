@@ -25,20 +25,15 @@ class _ComfortLevelState extends State<ComfortLevel> {
     Conexion conexion = Conexion();
 
     try {
-      RespuestaGenerica respuesta = await conexion.solicitudGet('/weatherdatas', false);
+      RespuestaGenerica respuesta = await conexion.solicitudGet('/weatherdatas?limit=1', false);
 
       print('Respuesta del backend: ${respuesta.msg}');
 
       if (respuesta.msg == 'OK' && respuesta.results != null) {
         // Verificar si la respuesta.data no es nula
         final List<dynamic> dataList = respuesta.results;
-        print('listaaa${dataList}');
-
         if (dataList.isNotEmpty) {
           final WeatherEntry lastEntry = WeatherEntry.fromJson(dataList.last);
-
-          print('Última entrada recibida: $lastEntry');
-
           setState(() {
             lastHumidity = "${lastEntry.humidity.toStringAsFixed(0)}%";
           });

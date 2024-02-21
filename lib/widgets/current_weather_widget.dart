@@ -59,19 +59,13 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
     print('Al menos entra');
 
     try {
-      RespuestaGenerica respuesta = await conexion.solicitudGet('/weatherdatas', false);
-
-      print('Respuesta del backend: ${respuesta.msg}');
-
+      RespuestaGenerica respuesta = await conexion.solicitudGet('/weatherdatas?limit=1', false);
       if (respuesta.msg == 'OK') {
         final List<dynamic> dataList = respuesta.results;
-        print('listaaa${dataList}');
+
         if (dataList.isNotEmpty) {
           final WeatherEntry lastEntry = WeatherEntry.fromJson(dataList.last);
-
-          print('Última entrada recibida: $lastEntry');
-
-          setState(() {
+      setState(() {
             lastBarometricPressure = "${lastEntry.barometricPressure.toStringAsFixed(0)}hPa";
             lastTemperature = "${lastEntry.temperature.toStringAsFixed(2)}°C";
             lastHumidity = "${lastEntry.humidity.toStringAsFixed(0)}%";
@@ -189,7 +183,7 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
       "pressure": pressure,
     };
 
-    final String url = '${conexion.URL}/weathercondition/state';
+    final String url = '${conexion.URL}/weatherconditions/state';
     final Map<String, String> headers = {'Content-Type': 'application/json'};
 
     try {
@@ -201,7 +195,6 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
 
       if (response.statusCode == 200) {
         Map<String, dynamic> responseBody = jsonDecode(response.body);
-        print('respuestaestadooo: ${response.body}');
         if (responseBody['weatherState'] != null) {
           Map<String, dynamic> weatherState = responseBody['weatherState'];
           return weatherState['weatherType'];
