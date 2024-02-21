@@ -1,62 +1,28 @@
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:weather_app/models/WeatherData.dart';
 import 'dart:convert';
 
-import '../controller/Conexion.dart';
-import '../controller/service/RespuestaGenerica.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:weather_app/utils/api_endpoints.dart';
+
 import '../utils/custom_colors.dart';
 
 class CurrentWeatherWidget extends StatefulWidget {
+  final String lastBarometricPressure;
+  final String lastTemperature;
+  final String lastHumidity;
+
+  const CurrentWeatherWidget({
+    Key? key,
+    required this.lastBarometricPressure,
+    required this.lastTemperature,
+    required this.lastHumidity,
+  }) : super(key: key);
+
   @override
   _CurrentWeatherWidgetState createState() => _CurrentWeatherWidgetState();
 }
 
 class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
-  late String lastBarometricPressure;
-  late String lastTemperature;
-  late String lastHumidity;
-  Conexion conexion = Conexion();
-  @override
-  void initState() {
-    super.initState();
-    lastBarometricPressure = "";
-    lastTemperature = "";
-    lastHumidity = "";
-    fetchData();
-  }
-
-  Future<void> fetchData() async {
-    print('Al menos entra');
-
-    try {
-      RespuestaGenerica respuesta = await conexion.solicitudGet('/weatherdata/free', false);
-
-      print('Respuesta del backend: ${respuesta.msg}');
-
-      if (respuesta.msg == 'OK') {
-        final List<dynamic> dataList = respuesta.data;
-        print('listaaa${dataList}');
-        if (dataList.isNotEmpty) {
-          final WeatherEntry lastEntry = WeatherEntry.fromJson(dataList.last);
-
-          print('Última entrada recibida: $lastEntry');
-
-          setState(() {
-            lastBarometricPressure = "${lastEntry.barometricPressure.toStringAsFixed(0)}hPa";
-            lastTemperature = "${lastEntry.temperature.toStringAsFixed(2)}°C";
-            lastHumidity = "${lastEntry.humidity.toStringAsFixed(0)}%";
-          });
-        }
-      } else {
-        // Manejar error de solicitud
-        print('Error en la solicitud: ${respuesta.msg}');
-      }
-    } catch (error) {
-      print('Error en fetchData: $error');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -123,7 +89,7 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
               height: 20,
               width: 60,
               child: Text(
-                lastBarometricPressure ?? "", // Última presión atmosférica
+                widget.lastBarometricPressure, // Última presión atmosférica
                 style: const TextStyle(fontSize: 12),
                 textAlign: TextAlign.center,
               ),
@@ -132,7 +98,7 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
               height: 20,
               width: 60,
               child: Text(
-                lastTemperature ?? "", // Última temperatura
+                widget.lastTemperature, // Última temperatura
                 style: const TextStyle(fontSize: 12),
                 textAlign: TextAlign.center,
               ),
@@ -141,7 +107,7 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
               height: 20,
               width: 60,
               child: Text(
-                lastHumidity ?? "", // Última humedad
+                widget.lastHumidity, // Última humedad
                 style: const TextStyle(fontSize: 12),
                 textAlign: TextAlign.center,
               ),
@@ -152,14 +118,15 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
     );
   }
 
-  Future<String> fetchWeatherType(double temperature, int humidity, double pressure) async {
+  Future<String> fetchWeatherType(
+      double temperature, int humidity, double pressure) async {
     final Map<String, dynamic> requestData = {
       "temperature": temperature,
       "humidity": humidity,
       "pressure": pressure,
     };
 
-    final String url = '${conexion.URL}/weathercondition/state';
+    final String url = '${ApiEndPoints.baseUrlApi}/weatherconditions/state';
     final Map<String, String> headers = {'Content-Type': 'application/json'};
 
     try {
@@ -171,41 +138,44 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
 
       if (response.statusCode == 200) {
         Map<String, dynamic> responseBody = jsonDecode(response.body);
-        print('respuestaestadooo: ${response.body}');
+
         if (responseBody['weatherState'] != null) {
           Map<String, dynamic> weatherState = responseBody['weatherState'];
           return weatherState['weatherType'];
         } else {
-          print('Error al obtener el estado del clima: weatherState no encontrado');
+          print(
+              'Error al obtener el estado del clima: weatherState no encontrado');
+
           return 'Desconocido';
         }
       } else {
         print('Error al obtener el estado del clima: ${response.statusCode}');
+
         return 'Desconocido';
       }
     } catch (error) {
       print('Error inesperado al obtener el estado del clima: $error');
+
       return 'Desconocido';
     }
   }
 
   Widget tempeatureAreaWidget() {
-    print('lastTemperature: $lastTemperature');
-    print('lastHumidity: $lastHumidity');
-    print('lastBarometricPressure: $lastBarometricPressure');
-    if (lastTemperature.isEmpty || lastHumidity.isEmpty || lastBarometricPressure.isEmpty) {
-      // Mostrar un indicador de carga mientras se obtienen los datos
-      return CircularProgressIndicator();
+    if (widget.lastTemperature.isEmpty ||
+        widget.lastHumidity.isEmpty ||
+        widget.lastBarometricPressure.isEmpty) {
+      return const CircularProgressIndicator();
     }
+
     return FutureBuilder<String>(
       future: fetchWeatherType(
-        double.parse(lastTemperature.replaceAll('°C', '')),
-        int.parse(lastHumidity.replaceAll('%', '')),
-        double.parse(lastBarometricPressure.replaceAll('hPa', '')),
+        double.parse(widget.lastTemperature.replaceAll('°C', '')),
+        int.parse(widget.lastHumidity.replaceAll('%', '')),
+        double.parse(widget.lastBarometricPressure.replaceAll('Pa', '')),
       ),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else {
@@ -214,13 +184,16 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
           // Seleccionar la URL de la imagen según el tipo de clima
           String imageUrl;
           if (weatherType == 'SOLEADO') {
-            imageUrl = 'https://cdn-icons-png.flaticon.com/128/4215/4215517.png';
+            imageUrl =
+                'https://cdn-icons-png.flaticon.com/128/4215/4215517.png';
           } else if (weatherType == 'NUBLADO') {
             imageUrl = 'https://cdn-icons-png.flaticon.com/128/899/899681.png';
           } else if (weatherType == 'LLUVIOSO') {
-            imageUrl = 'https://cdn-icons-png.flaticon.com/128/3217/3217172.png';
+            imageUrl =
+                'https://cdn-icons-png.flaticon.com/128/3217/3217172.png';
           } else {
-            imageUrl = 'https://cdn-icons-png.flaticon.com/128/6408/6408911.png';
+            imageUrl =
+                'https://cdn-icons-png.flaticon.com/128/6408/6408911.png';
           }
 
           return Row(
@@ -234,16 +207,18 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
               Container(
                 height: 50,
                 width: 1,
-                color: CustomColors.dividerLine, // Asegúrate de tener CustomColors definido
+                color: CustomColors
+                    .dividerLine, // Asegúrate de tener CustomColors definido
               ),
               RichText(
                 text: TextSpan(children: [
                   TextSpan(
-                    text: lastTemperature, // Mostrar temperatura
+                    text: widget.lastTemperature, // Mostrar temperatura
                     style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 50,
-                      color: CustomColors.textColorBlack, // Asegúrate de tener CustomColors definido
+                      color: CustomColors
+                          .textColorBlack, // Asegúrate de tener CustomColors definido
                     ),
                   ),
                   TextSpan(
@@ -262,5 +237,4 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
       },
     );
   }
-
 }

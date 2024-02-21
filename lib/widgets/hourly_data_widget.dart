@@ -1,10 +1,12 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:weather_app/utils/custom_colors.dart';
 import 'package:weather_app/controller/global_controller.dart';
+import 'package:weather_app/utils/api_endpoints.dart';
+import 'package:weather_app/utils/custom_colors.dart';
 
 class Pronosticos {
   late Map<String, dynamic> barometricPressure;
@@ -24,10 +26,10 @@ class Pronosticos {
   }
 
   Map<String, double> _convertToDoubleMap(Map<String, dynamic> input) {
-    return input.map((key, value) => MapEntry(key, value is int ? value.toDouble() : value));
+    return input.map(
+        (key, value) => MapEntry(key, value is int ? value.toDouble() : value));
   }
 }
-
 
 class HourlyDataWidget extends StatelessWidget {
   final RxInt cardIndex = GlobalController().getIndex();
@@ -93,8 +95,10 @@ class HourlyDataWidget extends StatelessWidget {
                   )
                 ],
                 gradient: cardIndex.value == index
-                    ? const LinearGradient(
-                    colors: [CustomColors.firstGradientColor, CustomColors.secondGradientColor])
+                    ? const LinearGradient(colors: [
+                        CustomColors.firstGradientColor,
+                        CustomColors.secondGradientColor
+                      ])
                     : null,
               ),
               child: HourlyDetails(
@@ -103,7 +107,8 @@ class HourlyDataWidget extends StatelessWidget {
                 temp: temp.round(),
                 pressure: pressure,
                 humidity: humidity,
-                timeStamp: DateTime.parse(timeStamp).millisecondsSinceEpoch ~/ 1000,
+                timeStamp:
+                    DateTime.parse(timeStamp).millisecondsSinceEpoch ~/ 1000,
                 weatherIcon: iconUrl,
               ),
             ),
@@ -126,13 +131,19 @@ class HourlyDataWidget extends StatelessWidget {
   }
 
   Future<Pronosticos> fetchData() async {
-    final response = await http.get(Uri.parse('https://model-pronostic.onrender.com/pronostico'));
+    try {
+      final response = await http.get(Uri.parse(ApiEndPoints.baseUrlPython));
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> jsonData = json.decode(response.body);
-      return Pronosticos.fromJson(jsonData);
-    } else {
-      throw Exception('Error al cargar los datos');
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonData = json.decode(response.body);
+        return Pronosticos.fromJson(jsonData);
+      } else {
+        throw Exception('Error al cargar los datos');
+      }
+    } catch (error) {
+      print(error.toString());
+
+      throw error;
     }
   }
 }
@@ -173,7 +184,9 @@ class HourlyDetails extends StatelessWidget {
           child: Text(
             getTime(timeStamp),
             style: TextStyle(
-              color: cardIndex == index ? Colors.white : CustomColors.textColorBlack,
+              color: cardIndex == index
+                  ? Colors.white
+                  : CustomColors.textColorBlack,
             ),
           ),
         ),
@@ -192,19 +205,25 @@ class HourlyDetails extends StatelessWidget {
               Text(
                 "${temp.toStringAsFixed(2)}°",
                 style: TextStyle(
-                  color: cardIndex == index ? Colors.white : CustomColors.textColorBlack,
+                  color: cardIndex == index
+                      ? Colors.white
+                      : CustomColors.textColorBlack,
                 ),
               ),
               Text(
                 "${pressure.toStringAsFixed(2)} hPa",
                 style: TextStyle(
-                  color: cardIndex == index ? Colors.white : CustomColors.textColorBlack,
+                  color: cardIndex == index
+                      ? Colors.white
+                      : CustomColors.textColorBlack,
                 ),
               ),
               Text(
                 "${humidity.toStringAsFixed(2)}%",
                 style: TextStyle(
-                  color: cardIndex == index ? Colors.white : CustomColors.textColorBlack,
+                  color: cardIndex == index
+                      ? Colors.white
+                      : CustomColors.textColorBlack,
                 ),
               ),
             ],

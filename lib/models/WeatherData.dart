@@ -1,11 +1,11 @@
 class WeatherData {
-  final String msg;
-  final int totalCount;
+  final String? msg;
+  final int? totalCount;
   final List<WeatherEntry> data;
 
   WeatherData({
-    required this.msg,
-    required this.totalCount,
+    this.msg = "",
+    this.totalCount = 0,
     required this.data,
   });
 
@@ -13,7 +13,7 @@ class WeatherData {
     return WeatherData(
       msg: json['msg'],
       totalCount: json['totalCount'],
-      data: (json['data'] as List)
+      data: (json['results'] as List)
           .map((entry) => WeatherEntry.fromJson(entry))
           .toList(),
     );
@@ -27,22 +27,22 @@ class WeatherEntry {
   final int humidity;
   final double barometricPressure;
   final DateTime? deletedAt;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
   final String state;
   final String id;
 
   WeatherEntry({
-    required this.dateTime,
-    required this.windSpeed,
-    required this.temperature,
-    required this.humidity,
-    required this.barometricPressure,
-    required this.deletedAt,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.state,
-    required this.id,
+    this.dateTime = '',
+    this.windSpeed = 0,
+    this.temperature = 0.0,
+    this.humidity = 0,
+    this.barometricPressure = 0.0,
+    this.deletedAt,
+    this.createdAt,
+    this.updatedAt,
+    this.state = '',
+    this.id = '',
   });
 
   factory WeatherEntry.fromJson(Map<String, dynamic> json) {
@@ -52,11 +52,10 @@ class WeatherEntry {
       temperature: json['temperature'],
       humidity: json['humidity'],
       barometricPressure: json['barometricPressure'],
-      deletedAt: json['deletedAt'] != null
-          ? DateTime.parse(json['deletedAt'])
-          : null,
+      deletedAt:
+          json['deletedAt'] != null ? DateTime.parse(json['deletedAt']) : null,
       createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
+      // updatedAt: DateTime.parse(json['updatedAt']),
       state: json['state'],
       id: json['id'],
     );

@@ -9,7 +9,7 @@ class HeaderWidget extends StatefulWidget {
 }
 
 class _HeaderWidgetState extends State<HeaderWidget> {
-  String city = "LOJA - LOJA";
+  String city = "UNL, Loja, Ecuador";
   String date = DateFormat("yMMMMd").format(DateTime.now());
 
   @override
@@ -32,7 +32,7 @@ class _HeaderWidgetState extends State<HeaderWidget> {
           child: Text(
             date,
             style:
-            TextStyle(fontSize: 14, color: Colors.grey[700], height: 1.5),
+                TextStyle(fontSize: 14, color: Colors.grey[700], height: 1.5),
           ),
         ),
       ],
