@@ -116,9 +116,9 @@ class HourlyDataWidget extends StatelessWidget {
   String getIconUrl(double temp) {
     if (temp > 20) {
       return 'https://cdn-icons-png.flaticon.com/128/4215/4215517.png';
-    } else if (temp >= 15 && temp <= 20) {
+    } else if (temp >= 15 && temp <= 17) {
       return 'https://cdn-icons-png.flaticon.com/128/899/899681.png';
-    } else if (temp < 15) {
+    } else if (temp < 20) {
       return 'https://cdn-icons-png.flaticon.com/128/3217/3217172.png';
     } else {
       return 'https://cdn-icons-png.flaticon.com/128/6408/6408911.png';
