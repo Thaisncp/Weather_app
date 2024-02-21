@@ -25,36 +25,6 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
     fetchData();
   }
 
-  /**Future<void> fetchData() async {
-    print('Al menos entra');
-
-    try {
-      RespuestaGenerica respuesta = await conexion.solicitudGet('/weatherdatas', false);
-
-      print('Respuesta del backend: ${respuesta.msg}');
-
-      if (respuesta.msg == 'OK') {
-        final List<dynamic> dataList = respuesta.data;
-        print('listaaa${dataList}');
-        if (dataList.isNotEmpty) {
-          final WeatherEntry lastEntry = WeatherEntry.fromJson(dataList.last);
-
-          print('Última entrada recibida: $lastEntry');
-
-          setState(() {
-            lastBarometricPressure = "${lastEntry.barometricPressure.toStringAsFixed(0)}hPa";
-            lastTemperature = "${lastEntry.temperature.toStringAsFixed(2)}°C";
-            lastHumidity = "${lastEntry.humidity.toStringAsFixed(0)}%";
-          });
-        }
-      } else {
-        // Manejar error de solicitud
-        print('Error en la solicitud: ${respuesta.msg}');
-      }
-    } catch (error) {
-      print('Error en fetchData: $error');
-    }
-  }*/
   Future<void> fetchData() async {
     print('Al menos entra');
 
