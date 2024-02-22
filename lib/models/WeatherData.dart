@@ -24,7 +24,7 @@ class WeatherEntry {
   final String dateTime;
   final int windSpeed;
   final double temperature;
-  final int humidity;
+  final double humidity;
   final double barometricPressure;
   final DateTime? deletedAt;
   final DateTime? createdAt;
