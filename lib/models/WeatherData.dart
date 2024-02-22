@@ -1,21 +1,19 @@
-import 'dart:convert';
-
 class WeatherData {
-  final String msg;
-  final int totalCount;
-  final List<WeatherEntry> results;
+  final String? msg;
+  final int? totalCount;
+  final List<WeatherEntry> data;
 
   WeatherData({
-    required this.msg,
-    required this.totalCount,
-    required this.results,
+    this.msg = "",
+    this.totalCount = 0,
+    required this.data,
   });
 
   factory WeatherData.fromJson(Map<String, dynamic> json) {
     return WeatherData(
       msg: json['msg'],
       totalCount: json['totalCount'],
-      results: (json['results'] as List)
+      data: (json['results'] as List)
           .map((entry) => WeatherEntry.fromJson(entry))
           .toList(),
     );
@@ -23,39 +21,43 @@ class WeatherData {
 }
 
 class WeatherEntry {
-  DateTime? dateTime;
-  double windSpeed;
-  double temperature;
-  int humidity;
-  double barometricPressure;
-  String state;
-  DateTime? deletedAt;
-  DateTime? createdAt;
-  String id;
+  final String dateTime;
+  final int windSpeed;
+  final double temperature;
+  final int humidity;
+  final double barometricPressure;
+  final DateTime? deletedAt;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+  final String state;
+  final String id;
 
   WeatherEntry({
-    this.dateTime,
-    required this.windSpeed,
-    required this.temperature,
-    required this.humidity,
-    required this.barometricPressure,
-    required this.state,
+    this.dateTime = '',
+    this.windSpeed = 0,
+    this.temperature = 0.0,
+    this.humidity = 0,
+    this.barometricPressure = 0.0,
     this.deletedAt,
     this.createdAt,
-    required this.id,
+    this.updatedAt,
+    this.state = '',
+    this.id = '',
   });
 
   factory WeatherEntry.fromJson(Map<String, dynamic> json) {
     return WeatherEntry(
-      dateTime: json['dateTime'] != null ? DateTime.parse(json['dateTime']) : null,
-      windSpeed: json['windSpeed']?.toDouble() ?? 0.0,
-      temperature: json['temperature']?.toDouble() ?? 0.0,
-      humidity: json['humidity'] ?? 0,
-      barometricPressure: json['barometricPressure']?.toDouble() ?? 0.0,
-      state: json['state'] ?? "",
-      deletedAt: json['deletedAt'] != null ? DateTime.parse(json['deletedAt']) : null,
-      createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
-      id: json['id'] ?? "",
+      dateTime: json['dateTime'],
+      windSpeed: json['windSpeed'],
+      temperature: json['temperature'],
+      humidity: json['humidity'],
+      barometricPressure: json['barometricPressure'],
+      deletedAt:
+          json['deletedAt'] != null ? DateTime.parse(json['deletedAt']) : null,
+      createdAt: DateTime.parse(json['createdAt']),
+      // updatedAt: DateTime.parse(json['updatedAt']),
+      state: json['state'],
+      id: json['id'],
     );
   }
 }
